@@ -294,6 +294,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         result = inputs.reduce((a, b, i) => i === 0 ? a : a / b, inputs[0]);
         break;
+      case 'modulus':  // <-- ADD THIS CASE
+        if (inputs.some((v, i) => i > 0 && v === 0)) return 'Cannot perform modulus by zero';
+        result = inputs.reduce((a, b, i) => (i === 0 ? a : a % b), inputs[0]);
+        break;
       default:
         return 'Unknown operation';
     }
@@ -329,6 +333,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         break;
       case 'division':
         operator = '÷';
+        break;
+      case 'modulus':
+        operator = '%';
         break;
       default:
         operator = '?';
@@ -459,8 +466,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // Check for division by zero
-    if (calcTypeInput.value === 'division' && newInputs.some((value, index) => index > 0 && value === 0)) {
-      showError('Division by zero is not allowed.');
+    if (
+      (calcTypeInput.value === 'division' || calcTypeInput.value === 'modulus') && newInputs.some((value, index) => index > 0 && value === 0)
+    ) {
+      showError(
+        calcTypeInput.value === 'division'
+          ? 'Division by zero is not allowed.'
+          : 'Modulus by zero is not allowed.'
+      );
       return;
     }
 
