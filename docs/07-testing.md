@@ -132,7 +132,7 @@ Let's write some unit tests for our calculation models:
 ```python
 # tests/unit/test_calculator.py
 import pytest
-from app.models.calculation import Addition, Subtraction, Multiplication, Division
+from app.models.calculation import Addition, Subtraction, Multiplication, Division, Modulus
 
 def test_addition():
     """Test addition calculation."""
@@ -177,6 +177,23 @@ def test_division_by_zero():
     
     # Verify the error message
     assert "Cannot divide by zero" in str(excinfo.value)
+
+def test_modulus():
+    """Test modulus calculation."""
+    calc = Modulus(inputs=[20, 7])
+    assert calc.get_result() == 6
+
+def test_modulus_sequential():
+    """Test sequential modulus calculation."""
+    calc = Modulus(inputs=[20, 7, 2])  # ((20 % 7) % 2) = (6 % 2) = 0
+    assert calc.get_result() == 0
+
+def test_modulus_by_zero():
+    """Test modulus by zero raises ValueError."""
+    calc = Modulus(inputs=[12, 0])
+    with pytest.raises(ValueError) as excinfo:
+        calc.get_result()
+    assert "modulus by zero" in str(excinfo.value).lower()
 
 def test_invalid_inputs():
     """Test invalid inputs raise ValueError."""
@@ -223,6 +240,30 @@ def test_create_calculation(client, auth_header):
     assert "id" in data
     assert "created_at" in data
     assert "updated_at" in data
+
+def test_create_modulus_calculation(client, auth_header):
+    """Create a modulus calculation via API."""
+    r = client.post(
+        "/calculations",
+        json={"type": "modulus", "inputs": [20, 7]},
+        headers=auth_header
+    )
+    assert r.status_code == 201
+    data = r.json()
+    assert data["type"] == "modulus"
+    assert data["inputs"] == [20, 7]
+    assert data["result"] == 6
+
+def test_create_modulus_by_zero_rejected(client, auth_header):
+    """Modulus by zero should be rejected by validation/handler."""
+    r = client.post(
+        "/calculations",
+        json={"type": "modulus", "inputs": [10, 0]},
+        headers=auth_header
+    )
+    # Depending on your exception handling this may be 422 (Pydantic) or 400 (app)
+    assert r.status_code in (400, 422)
+    assert "modulus" in r.text.lower() and "zero" in r.text.lower()
 
 def test_list_calculations(client, auth_header, db_session, test_user):
     """Test listing calculations for a user."""
@@ -618,7 +659,7 @@ def test_calculations(db_session, test_user):
     calculations = []
     
     # Create one of each calculation type
-    calc_types = ["addition", "subtraction", "multiplication", "division"]
+    calc_types = ["addition", "subtraction", "multiplication", "division", "modulus"]
     for calc_type in calc_types:
         calc = Calculation.create(
             calculation_type=calc_type,

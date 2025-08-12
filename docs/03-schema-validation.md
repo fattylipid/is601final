@@ -115,13 +115,13 @@ from app.schemas.base import BaseSchema
 
 class CalculationBase(BaseSchema):
     """Base schema for calculation data."""
-    type: str = Field(..., description="Type of calculation: addition, subtraction, multiplication, division")
+    type: str = Field(..., description="Type of calculation: addition, subtraction, multiplication, division, modulus")
     inputs: List[float] = Field(..., min_items=2, description="List of input numbers")
     
     @validator('type')
     def validate_calculation_type(cls, v):
         """Validate the calculation type."""
-        valid_types = ['addition', 'subtraction', 'multiplication', 'division']
+        valid_types = ['addition', 'subtraction', 'multiplication', 'division', 'modulus']
         if v.lower() not in valid_types:
             raise ValueError(f'Type must be one of: {", ".join(valid_types)}')
         return v.lower()

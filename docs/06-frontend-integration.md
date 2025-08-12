@@ -131,7 +131,7 @@ Now, let's create templates for each page in our application:
     <div class="feature-grid">
         <div class="feature-card">
             <h3>Basic Operations</h3>
-            <p>Perform addition, subtraction, multiplication, and division.</p>
+            <p>Perform addition, subtraction, multiplication, division, and modulus.</p>
         </div>
         <div class="feature-card">
             <h3>Save Calculations</h3>
@@ -362,6 +362,7 @@ Now, let's create templates for each page in our application:
                         <option value="subtraction">Subtraction</option>
                         <option value="multiplication">Multiplication</option>
                         <option value="division">Division</option>
+                        <option value="modulus">Modulus</option>
                     </select>
                 </div>
                 
