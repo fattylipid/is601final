@@ -750,6 +750,10 @@ small {
     background-color: #f39c12;
 }
 
+.calc-type.modulus {
+    background-color: #e3529fff;
+}
+
 .calc-result {
     font-size: 1.5rem;
     font-weight: bold;
